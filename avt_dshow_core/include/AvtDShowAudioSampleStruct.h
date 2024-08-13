@@ -1,0 +1,11 @@
+#ifndef AVTDSHOWAUDIOSAMPLESTRUCT_H
+#define AVTDSHOWAUDIOSAMPLESTRUCT_H
+
+typedef struct _AUDIO_SAMPLE_INFO
+{
+    DWORD dwChannels;
+    DWORD dwBitsPerSample;
+    DWORD dwSamplingRate;
+}AUDIO_SAMPLE_INFO;
+
+#endif // AVTDSHOWAUDIOSAMPLESTRUCT_H

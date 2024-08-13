@@ -1,0 +1,41 @@
+# Exclude everything
+/*
+
+# Except for default project files
+!/.github
+!/build-aux
+!/cmake
+!/data
+!/avt_dshow_core
+!/avt_device_opener
+!/rtk_sdk
+!/src
+!/test
+!/i18n
+!.clang-format
+!.cmake-format.json
+!.gitignore
+!buildspec.json
+!CMakeLists.txt
+!CMakePresets.json
+!LICENSE
+!README.md
+!qt.version
+
+# Exclude lock files
+*.lock.json
+
+# Exclude macOS legacy resource forks
+.DS_Store
+
+# Exclude CMake build number cache
+/cmake/.CMakeBuildNumber
+
+# Exclude othere files
+data/RTICE_SDK_x64.dll
+data/RTK_IO_x64.dll
+data/libRTICE_SDK_x64.dylib
+data/libRTK_IO_x64.dylib
+
+avt_dshow_core/build*
+avt_device_opener/build*
