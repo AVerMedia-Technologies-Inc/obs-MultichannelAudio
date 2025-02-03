@@ -4,16 +4,13 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/common/bootstrap.cmake" NO_POLICY_SCO
 
 project(${_name} VERSION ${_version})
 
-# Set built time
-# https://stackoverflow.com/a/71763529/21177210
-string(TIMESTAMP MY_BUILT_TIME "%Y/%m/%d %H:%M:%S")
-message("Built Time: ${MY_BUILT_TIME}")
-add_compile_definitions(MY_BUILT_TIME_STR="${MY_BUILT_TIME}")
-
 option(ENABLE_FRONTEND_API "Use obs-frontend-api for UI functionality" OFF)
 option(ENABLE_QT "Use Qt functionality" OFF)
 
+include(avermedia_deps.cmake) # setup for AVerMedia parameters and dependencies
+
 add_compile_definitions(_X64_MACHINE)
+add_compile_definitions(PLUGIN_DISPLAY_NAME="${OBS_PLUGIN_DISPLAY_NAME}")
 
 include(compilerconfig)
 include(defaults)

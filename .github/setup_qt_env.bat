@@ -1,8 +1,22 @@
 @echo off
 
-SET QT_KIT_BAT="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvarsall.bat"
-SET MSVC_COMPILER=C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Tools/MSVC/14.29.30133/bin/HostX64/x64/cl.exe
+REM Check Visual Studio version
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+	echo Visual Studio 2019 Professional
+    SET MSVC_EDITION=Professional
+) else (
+	if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" (
+		echo Visual Studio 2019 Community
+        SET MSVC_EDITION=Community
+	) else (
+		echo "Not supported Visual Studio version or not installed"
+		exit /b 1
+	)
+)
+SET QT_KIT_BAT="C:\Program Files (x86)\Microsoft Visual Studio\2019\%MSVC_EDITION%\VC\Auxiliary\Build\vcvarsall.bat"
+SET MSVC_COMPILER=C:/Program Files (x86)/Microsoft Visual Studio/2019/%MSVC_EDITION%/VC/Tools/MSVC/14.29.30133/bin/HostX64/x64/cl.exe
 
+REM Check Qt version
 SET PROJECT_ROOT=%~dp0..
 REM echo %PROJECT_ROOT%
 SET QT_VERSION_FILE=%PROJECT_ROOT%\qt.version
@@ -50,9 +64,12 @@ if not %ERRORLEVEL% == 0 (
     EXIT /b 1
 )
 
-call %QT_KIT_BAT% amd64
-if not %ERRORLEVEL% == 0 (
-    EXIT /b 1
+REM https://stackoverflow.com/a/19929778
+if not defined DevEnvDir (
+    call %QT_KIT_BAT% amd64
+	if not %ERRORLEVEL% == 0 (
+		EXIT /b 1
+	)
 )
 
 REM we need to change directory since previous script will change to Qt Kit folder

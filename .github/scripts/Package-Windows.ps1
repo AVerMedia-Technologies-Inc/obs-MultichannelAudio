@@ -45,7 +45,7 @@ function Package {
     }
 
     $BuildSpec = Get-Content -Path ${BuildSpecFile} -Raw | ConvertFrom-Json
-    $ProductName = $BuildSpec.name
+    $ProductName = $BuildSpec.displayName.replace(' ','')
     $ProductVersion = $BuildSpec.version
 
     $OutputName = "${ProductName}-${ProductVersion}-windows-${Target}"
@@ -59,6 +59,7 @@ function Package {
         Path = @(
             "${ProjectRoot}/release/${ProductName}-*-windows-*.zip"
             "${ProjectRoot}/release/${ProductName}-*-windows-*.exe"
+			"${ProjectRoot}/release/${Configuration}/obs-plugins/64bit/*.pdb"
         )
     }
 
@@ -86,8 +87,15 @@ function Package {
         Push-Location -Stack BuildTemp
         Ensure-Location -Path "${ProjectRoot}/release"
         Copy-Item -Path ${Configuration} -Destination Package -Recurse
-        Invoke-External iscc ${IsccFile} /O"${ProjectRoot}/release" /F"${OutputName}-Installer"
-        Remove-Item -Path Package -Recurse
+		try {
+			Invoke-External iscc ${IsccFile} /O"${ProjectRoot}/release" /F"${OutputName}-Installer"
+		}
+		catch {
+			Log-Error "Invoke-External error occurred!"
+		}
+		finally {
+			Remove-Item -Path Package -Recurse
+		}
         Pop-Location -Stack BuildTemp
 
         Log-Group

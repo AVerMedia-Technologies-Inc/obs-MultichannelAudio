@@ -1,21 +1,24 @@
-#define MyAppName "@PLUGIN_DISPLAY_NAME@"
+#define MyAppName "@CMAKE_PROJECT_NAME@"
+#define MyAppDisplayName "@PLUGIN_DISPLAY_NAME@"
 #define MyAppVersion "@CMAKE_PROJECT_VERSION@"
 #define MyAppPublisher "@PLUGIN_AUTHOR@"
 #define MyAppURL "@PLUGIN_WEBSITE@"
+#define MyAppID "{@UUID_APP@}"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{@UUID_APP@}}
-AppName={#MyAppName}
+AppId={{@UUID_APP@}
+; Note: Inno Setup seems to append the last '}' to uninstaller
+AppName={#MyAppDisplayName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={code:GetDirName}
-DefaultGroupName={#MyAppName}
+DefaultGroupName={#MyAppDisplayName}
 OutputBaseFilename={#MyAppName}-{#MyAppVersion}-Windows-Installer
 Compression=lzma
 SolidCompression=yes
@@ -25,6 +28,10 @@ PrivilegesRequired=admin
 AppCopyright=Copyright (C) 2024 AVerMedia Technologies, Inc.
 WizardStyle=classic
 VersionInfoVersion={#MyAppVersion}
+UsedUserAreasWarning=no
+SetupIconFile=..\data\ap_32.ico
+UninstallDisplayIcon={app}\data\obs-plugins\{#MyAppName}\ap_32.ico
+DisableDirPage=no
 
 [Languages]
 Name: "en_US"; MessagesFile: "compiler:Default.isl,..\i18n\en_US.isl"; LicenseFile: "..\i18n\en.lproj\LICENSE.txt";
@@ -55,12 +62,18 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 [Registry]
 ; write to the registry on a 64-bit machine
 ; https://stackoverflow.com/a/12958439
-Root: HKLM64; Subkey: "Software\AVerMedia"; Flags: createvalueifdoesntexist; Check: IsWin64
-Root: HKLM64; Subkey: "Software\AVerMedia\OBS_Plugins\@CMAKE_PROJECT_NAME@"; Flags: createvalueifdoesntexist uninsdeletekey; Check: IsWin64
-Root: HKLM64; Subkey: "Software\AVerMedia\OBS_Plugins\@CMAKE_PROJECT_NAME@"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Check: IsWin64
-Root: HKLM64; Subkey: "Software\AVerMedia\OBS_Plugins\@CMAKE_PROJECT_NAME@"; ValueType: string; ValueName: "Language"; ValueData: "{language}"; Check: IsWin64
-Root: HKLM64; Subkey: "Software\AVerMedia\OBS_Plugins\@CMAKE_PROJECT_NAME@"; ValueType: string; ValueName: "Uninstaller"; ValueData: "{uninstallexe}"; Check: IsWin64
-Root: HKLM64; Subkey: "Software\AVerMedia\OBS_Plugins\@CMAKE_PROJECT_NAME@"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia"; Flags: createvalueifdoesntexist; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia\OBS_Plugins"; Flags: createvalueifdoesntexist; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia\OBS_Plugins\{#MyAppName}"; Flags: createvalueifdoesntexist uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia\OBS_Plugins\{#MyAppName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia\OBS_Plugins\{#MyAppName}"; ValueType: string; ValueName: "Language"; ValueData: "{language}"; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia\OBS_Plugins\{#MyAppName}"; ValueType: string; ValueName: "Uninstaller"; ValueData: "{uninstallexe}"; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia\OBS_Plugins\{#MyAppName}"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia\OBS_Plugins\{#MyAppName}"; ValueType: string; ValueName: "DisplayName"; ValueData: "{#MyAppDisplayName}"; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\AVerMedia\OBS_Plugins\{#MyAppName}"; ValueType: string; ValueName: "FilePath"; ValueData: "{app}\obs-plugins\64bit\{#MyAppName}.dll"; Check: IsWin64
+
+[InstallDelete]
+Type: filesandordirs; Name: "{app}\data\obs-plugins\{#MyAppName}"
 
 [Code]
 procedure InitializeWizard();
@@ -72,11 +85,12 @@ begin
   ExtractTemporaryFile('LICENSE');
   LoadStringFromFile(ExpandConstant('{tmp}\LICENSE'), GPLText);
   Page := CreateOutputMsgMemoPage(wpWelcome,
-    ExpandConstant('{cm:GPL_LicenseInformation}'), ExpandConstant('{cm:GPL_ReviewLicense,{#MyAppName}}'),
+    ExpandConstant('{cm:GPL_LicenseInformation}'), ExpandConstant('{cm:GPL_ReviewLicense,{#MyAppDisplayName}}'),
     ExpandConstant('{cm:GPL_LicenseInfoDesc}'),
     String(GPLText)
   );
 
+  PageFromID(wpLicense).Description := ExpandConstant('{cm:LicenseLabel1,{#MyAppDisplayName}}');
   // How to change default choice in License agreement in INNO Setup
   // https://stackoverflow.com/a/51291566/21177210
   WizardForm.LicenseAcceptedRadio.Checked := True;

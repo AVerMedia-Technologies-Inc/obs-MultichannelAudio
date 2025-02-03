@@ -98,15 +98,22 @@ struct pkg_data {
     uint8_t* data;
     int size;
 };
+
 static int read_packet(void *opaque, uint8_t *buf, int buf_size)
 {
 	auto decode = (ffmpeg_decode *)opaque;
 	//obs_log(LOG_INFO, "read_packet: buf_size=%d, %d", buf_size, decode->packets.size);
     //if (decode->kill) return AVERROR_EOF;
     //if (decode->packets.size <= 0) return 0;//AVERROR_UNKNOWN;
+
     while(true) { // wait for data
-        if (decode->kill) return AVERROR_EOF;
-        if (decode->packets.size > 0) break;
+        pthread_mutex_lock(&decode->mutex);
+		bool kill = decode->kill;
+		size_t packageSize = decode->packets.size;
+        pthread_mutex_unlock(&decode->mutex);
+
+        if (kill) return AVERROR_EOF;
+        if (packageSize > 0) break;
         os_sleep_ms(1);
     }
 
@@ -395,9 +402,10 @@ static void* ffmpeg_decode_thread(void *opaque)
     //ffmpeg_prepare_avio(decode);
     int ret;
     while (true) {
+		if (decode == nullptr) break;
         bool kill = false;
         pthread_mutex_lock(&decode->mutex);
-        if ((decode == nullptr) || (decode && decode->kill)) kill = true;
+		kill = decode->kill;
         pthread_mutex_unlock(&decode->mutex);
         if (kill) break;
 
@@ -440,7 +448,7 @@ FfmpegAudioDecode::FfmpegAudioDecode(obs_source_t* source)
     : decode(std::make_unique<ffmpeg_decode>())
 {
     if (pthread_mutex_init(&decode->mutex, NULL) != 0) {
-        obs_log(LOG_WARNING, "MP: Failed to init mutex");
+        obs_log(LOG_WARNING, "FfmpegAudioDecode: Failed to init mutex");
         return;
     }
 

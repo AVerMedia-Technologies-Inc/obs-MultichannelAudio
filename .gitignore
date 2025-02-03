@@ -21,6 +21,8 @@
 !LICENSE
 !README.md
 !qt.version
+!avermedia_deps.cmake
+!obs_qt_deps.cmake
 
 # Exclude lock files
 *.lock.json

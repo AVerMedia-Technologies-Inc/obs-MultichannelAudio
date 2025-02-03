@@ -1,2 +1,5 @@
 # MultichannelAudio
-AVerMedia Multichannel Audio is an OBS plugin that supports Dolby Audio in GC553G2.
+AVerMedia Multichannel Audio is an OBS source that supports Dolby Audio.
+* GC553G2
+* GC553PRO
+* GC575

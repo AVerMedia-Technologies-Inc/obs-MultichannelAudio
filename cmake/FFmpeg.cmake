@@ -1,7 +1,6 @@
 #set(ENABLE_FFMPEG_AUDIO_DECODE TRUE) # TRUE or FALSE
 
 set(current_project_dir "${CMAKE_CURRENT_LIST_DIR}/..")
-set(extra_obs_prebuilt_deps "obs-deps-2024-05-08")
 
 if (WIN32)
     set(extra_obs_prebuilt_arch "x64")
@@ -9,6 +8,8 @@ endif()
 if (APPLE)
     set(extra_obs_prebuilt_arch "universal")
 endif()
+set(extra_obs_prebuilt_deps "obs-deps-2024-05-08")
+message("extra_obs_prebuilt_deps = ${extra_obs_prebuilt_deps}")
 
 set(extra_obs_deps_dir "${current_project_dir}/.deps")
 set(extra_obs_prebuilt_deps_dir "${extra_obs_deps_dir}/${extra_obs_prebuilt_deps}-${extra_obs_prebuilt_arch}")
